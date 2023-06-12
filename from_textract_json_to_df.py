@@ -14,7 +14,7 @@ def get_cell_blocks(blocks):
       cell_blocks.append(block)
   return cell_blocks
   
- def get_line_blocks(blocks):
+def get_line_blocks(blocks):
   line_blocks = []
   for block in blocks:
     if block['BlockType'] == 'LINE':
