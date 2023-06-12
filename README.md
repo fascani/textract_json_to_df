@@ -6,4 +6,4 @@ For instance, if you look at the current state-of-the-art library to use with AW
 
 Another example is given in the notebook [`textract-merged-cols-failure-and-solution.ipynb`](https://github.com/fascani/textract_json_to_df/blob/main/textract-merged-cols-failure-and-solution.ipynb) together with how to implement a solution with  [`from_textract_json_to_df.py`](https://github.com/fascani/textract_json_to_df/blob/main/from_textract_json_to_df.py).
 
-The trick used to succeed to merge columns is that we use the `LINE` objects instead of the `CELL` objects to fill up the dataframe and, in a second step, mergethe content of columns that need to be merged using the `MERGED_CELL` objects.
+The trick used to merge columns successfully is to use the `LINE` objects instead of the `CELL` objects to fill up the dataframe and, in a second step, and to merge the content of columns that need to be merged using the `MERGED_CELL` objects.
