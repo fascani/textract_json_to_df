@@ -238,5 +238,9 @@ def build_df(textract_json):
           # Replace with the content back in the dataframe for each column
           for jj in range(colspan):
             tables[key].loc[row0, col0+jj] = content.strip()
+    # Create column headers if headers were identified
+    if column_header_flags[key]:
+      tables[key].columns = tables[key].loc[0]
+      tables[key] = tables[key].loc[1:]
 
   return tables
