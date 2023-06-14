@@ -1,6 +1,15 @@
 import pandas as pd
 
+def get_blocks(textract_json):
+  '''
+  Return the list of block ids from a textract json file.
+  '''
+  return textract_json['Blocks']
+
 def get_table_blocks(blocks):
+  '''
+  Return the list of ids of table objects from the list of block ids.
+  '''
   table_blocks = []
   for block in blocks:
     if block['BlockType'] == 'TABLE':
@@ -8,6 +17,9 @@ def get_table_blocks(blocks):
   return table_blocks
   
 def get_cell_blocks(blocks):
+  '''
+  Return the list of ids of cell objects from the list of block ids.
+  '''
   cell_blocks = []
   for block in blocks:
     if block['BlockType'] == 'CELL':
@@ -15,6 +27,9 @@ def get_cell_blocks(blocks):
   return cell_blocks
   
 def get_line_blocks(blocks):
+  '''
+  Return the list of ids of line objects from the list of block ids.
+  '''
   line_blocks = []
   for block in blocks:
     if block['BlockType'] == 'LINE':
@@ -22,11 +37,25 @@ def get_line_blocks(blocks):
   return line_blocks
   
 def get_merged_cell_blocks(blocks):
+  '''
+  Return the list of ids of "merged cell" object from the list of block ids.
+  '''
   merged_cell_blocks = []
   for block in blocks:
     if block['BlockType'] == 'MERGED_CELL':
       merged_cell_blocks.append(block)
   return merged_cell_blocks
+
+def get_column_header_cell_blocks(cell_blocks):
+  '''
+  Return the list id of cell objects that are column headers from the list of cell ids.
+  '''
+  column_header_cell_blocks = []
+  for cell_block in cell_blocks:
+    if 'EntityTypes' in cell_block.keys():
+        if 'COLUMN_HEADER' in cell_block['EntityTypes']:
+          column_header_cell_blocks.append(cell_block)
+  return column_header_cell_blocks
   
 def construct_table_child_ids(table_blocks):
   '''
@@ -130,7 +159,7 @@ def build_df(textract_json):
   '''
 
   # Get blocks
-  blocks = textract_json['Blocks']
+  blocks = get_blocks(textract_json)
   table_blocks = get_table_blocks(blocks)
   cell_blocks = get_cell_blocks(blocks)
   line_blocks = get_line_blocks(blocks)
