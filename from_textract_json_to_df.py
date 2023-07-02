@@ -94,8 +94,11 @@ def construct_table_merged_cell_ids(table_blocks):
       # Find merged cells
       ii = 0
       max_ii = len(table_block['Relationships'])
-      while (table_block['Relationships'][ii]['Type'] != 'MERGED_CELL')&(ii<max_ii):
-        ii += 1
+      try:
+          while (table_block['Relationships'][ii]['Type'] != 'MERGED_CELL')&(ii<max_ii):
+            ii += 1
+      except:
+        print(table_block)
       if ii < max_ii: # Only do this if a CHILD relationship was found
         merged_cell_ids = table_block['Relationships'][ii]['Ids']
         table_merged_cell_ids[table_block['Id']] = merged_cell_ids
