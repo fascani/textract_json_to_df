@@ -70,9 +70,11 @@ def construct_table_child_ids(table_blocks):
       # Find childs
       ii = 0
       max_ii = len(table_block['Relationships'])
-      while (table_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii):
+      found = False
+      while (table_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii-1):
         ii += 1
-      if ii < max_ii: # Only do this if a CHILD relationship was found
+        found = True
+      if found: # Only do this if a CHILD relationship was found
         child_ids = table_block['Relationships'][ii]['Ids']
         table_child_ids[table_block['Id']] = child_ids
         for child_id in child_ids:
@@ -94,12 +96,11 @@ def construct_table_merged_cell_ids(table_blocks):
       # Find merged cells
       ii = 0
       max_ii = len(table_block['Relationships'])
-      try:
-          while (table_block['Relationships'][ii]['Type'] != 'MERGED_CELL')&(ii<max_ii):
-            ii += 1
-      except:
-        print(table_block)
-      if ii < max_ii: # Only do this if a CHILD relationship was found
+      found = False
+      while (table_block['Relationships'][ii]['Type'] != 'MERGED_CELL')&(ii<max_ii-1):
+        ii += 1
+        found = True
+      if found: # Only do this if a MERGED_CELL relationship was found
         merged_cell_ids = table_block['Relationships'][ii]['Ids']
         table_merged_cell_ids[table_block['Id']] = merged_cell_ids
         for merged_cell_id in merged_cell_ids:
@@ -120,9 +121,11 @@ def construct_cell_child_ids(cell_blocks):
     if 'Relationships' in cell_block.keys():
       ii = 0
       max_ii = len(cell_block['Relationships'])
-      while (cell_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii):
+      found = False
+      while (cell_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii-1):
         ii += 1
-      if ii < max_ii: # Only do this if a CHILD relationship was found
+        found = True
+      if found: # Only do this if a CHILD relationship was found
         child_ids = cell_block['Relationships'][ii]['Ids']
         cell_child_ids[cell_block['Id']] = child_ids
         for child_id in child_ids:
@@ -144,9 +147,11 @@ def construct_merged_cell_child_ids(merged_cell_blocks):
       # Find childs
       ii = 0
       max_ii = len(merged_cell_block['Relationships'])
-      while (merged_cell_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii):
+      found = False
+      while (merged_cell_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii-1):
         ii += 1
-      if ii < max_ii: # Only do this if a CHILD relationship was found
+        found = True
+      if found: # Only do this if a CHILD relationship was found
         child_ids = merged_cell_block['Relationships'][ii]['Ids']
         merged_cell_child_ids[merged_cell_block['Id']] = child_ids
         for child_id in child_ids:
