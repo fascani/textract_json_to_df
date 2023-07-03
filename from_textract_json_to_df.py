@@ -126,6 +126,9 @@ def construct_cell_child_ids(cell_blocks):
         for child_id in child_ids:
           if child_id not in child_cell_ids.keys(): # Don't add the child id if a cell was already found
             child_cell_ids[child_id] = cell_block['Id']
+    else:
+        # For empty cells, with no relationships
+        cell_child_ids[cell_block['Id']] = None
                       
   return cell_child_ids, child_cell_ids
   
@@ -217,6 +220,13 @@ def build_df(textract_json):
 
   # Additional treatment for each table
   for key in tables.keys():
+    # Add empty cells
+    for cell_id in table_child_ids[key]:
+        if cell_child_ids[cell_id] == None: # Empty cell detected
+            cell_block = [block for block in cell_blocks if block['Id']==cell_id][0]
+            row = cell_block['RowIndex']-1
+            col = cell_block['ColumnIndex']-1
+            tables[key].loc[row, col] = ''
     # Order row and column
     tables[key] = tables[key][tables[key].columns.sort_values()]
     tables[key] = tables[key].loc[tables[key].index.sort_values()]
