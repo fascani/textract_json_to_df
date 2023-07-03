@@ -68,13 +68,11 @@ def construct_table_child_ids(table_blocks):
   for table_block in table_blocks:
     if 'Relationships' in table_block.keys():
       # Find childs
-      ii = 0
-      max_ii = len(table_block['Relationships'])
-      found = False
-      while (table_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii-1):
-        ii += 1
-        found = True
-      if found: # Only do this if a CHILD relationship was found
+      rel_type_dict = {}
+      for ii in range(len(table_block['Relationships'])):
+        rel_type_dict[table_block['Relationships'][ii]['Type']] = ii
+      if 'CHILD' in rel_type_dict.keys(): # Only do this if a CHILD relationship was found
+        ii = rel_type_dict['CHILD']
         child_ids = table_block['Relationships'][ii]['Ids']
         table_child_ids[table_block['Id']] = child_ids
         for child_id in child_ids:
@@ -94,13 +92,11 @@ def construct_table_merged_cell_ids(table_blocks):
   for table_block in table_blocks:
     if 'Relationships' in table_block.keys():
       # Find merged cells
-      ii = 0
-      max_ii = len(table_block['Relationships'])
-      found = False
-      while (table_block['Relationships'][ii]['Type'] != 'MERGED_CELL')&(ii<max_ii-1):
-        ii += 1
-        found = True
-      if found: # Only do this if a MERGED_CELL relationship was found
+      rel_type_dict = {}
+      for ii in range(len(table_block['Relationships'])):
+        rel_type_dict[table_block['Relationships'][ii]['Type']] = ii
+      if 'MERGED_CELL' in rel_type_dict.keys(): # Only do this if a MERGED_CELL relationship was found
+        ii = rel_type_dict['MERGED_CELL']
         merged_cell_ids = table_block['Relationships'][ii]['Ids']
         table_merged_cell_ids[table_block['Id']] = merged_cell_ids
         for merged_cell_id in merged_cell_ids:
@@ -119,13 +115,12 @@ def construct_cell_child_ids(cell_blocks):
   child_cell_ids = {}
   for cell_block in cell_blocks:
     if 'Relationships' in cell_block.keys():
-      ii = 0
-      max_ii = len(cell_block['Relationships'])
-      found = False
-      while (cell_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii-1):
-        ii += 1
-        found = True
-      if found: # Only do this if a CHILD relationship was found
+      # Find child
+      rel_type_dict = {}
+      for ii in range(len(cell_block['Relationships'])):
+        rel_type_dict[cell_block['Relationships'][ii]['Type']] = ii
+      if 'CHILD' in rel_type_dict.keys(): # Only do this if a CHILD relationship was found
+        ii = rel_type_dict['CHILD']  
         child_ids = cell_block['Relationships'][ii]['Ids']
         cell_child_ids[cell_block['Id']] = child_ids
         for child_id in child_ids:
@@ -145,13 +140,11 @@ def construct_merged_cell_child_ids(merged_cell_blocks):
   for merged_cell_block in merged_cell_blocks:
     if 'Relationships' in merged_cell_block.keys():
       # Find childs
-      ii = 0
-      max_ii = len(merged_cell_block['Relationships'])
-      found = False
-      while (merged_cell_block['Relationships'][ii]['Type'] != 'CHILD')&(ii<max_ii-1):
-        ii += 1
-        found = True
-      if found: # Only do this if a CHILD relationship was found
+      rel_type_dict = {}
+      for ii in range(len(merged_cell_block['Relationships'])):
+        rel_type_dict[merged_cell_block['Relationships'][ii]['Type']] = ii
+      if 'CHILD' in rel_type_dict.keys(): # Only do this if a CHILD relationship was found
+        ii = rel_type_dict['CHILD']    
         child_ids = merged_cell_block['Relationships'][ii]['Ids']
         merged_cell_child_ids[merged_cell_block['Id']] = child_ids
         for child_id in child_ids:
@@ -230,22 +223,23 @@ def build_df(textract_json):
     # Replace NaN values by an empty string
     tables[key] = tables[key].fillna('')
     # Merge columns (concatenate strings)
-    merged_cell_ids = table_merged_cell_ids[key]
-    if len(merged_cell_ids)>0:
-      for merged_cell_id in merged_cell_ids:
-        # Get the block corresponding to this merged cell
-        merged_cell_block = [block for block in merged_cell_blocks if block['Id']==merged_cell_id][0]
-        if merged_cell_block['RowSpan'] == 1: # Check RowSpan is 1 (we only do merging of columns)
-          row0 = merged_cell_block['RowIndex']-1 # Get the row
-          col0 = merged_cell_block['ColumnIndex']-1 # Get the starting column index
-          colspan = merged_cell_block['ColumnSpan'] # Get the number of columns involved
-          # Build the content by concatenating the string from each column
-          content = ''
-          for jj in range(colspan):
-            content += ' ' + tables[key].loc[row0, col0+jj]
-          # Replace with the content back in the dataframe for each column
-          for jj in range(colspan):
-            tables[key].loc[row0, col0+jj] = content.strip()
+    if key in table_merged_cell_ids.keys():
+      merged_cell_ids = table_merged_cell_ids[key]
+      if len(merged_cell_ids)>0:
+        for merged_cell_id in merged_cell_ids:
+          # Get the block corresponding to this merged cell
+          merged_cell_block = [block for block in merged_cell_blocks if block['Id']==merged_cell_id][0]
+          if merged_cell_block['RowSpan'] == 1: # Check RowSpan is 1 (we only do merging of columns)
+            row0 = merged_cell_block['RowIndex']-1 # Get the row
+            col0 = merged_cell_block['ColumnIndex']-1 # Get the starting column index
+            colspan = merged_cell_block['ColumnSpan'] # Get the number of columns involved
+            # Build the content by concatenating the string from each column
+            content = ''
+            for jj in range(colspan):
+              content += ' ' + tables[key].loc[row0, col0+jj]
+            # Replace with the content back in the dataframe for each column
+            for jj in range(colspan):
+              tables[key].loc[row0, col0+jj] = content.strip()
     # Create column headers if headers were identified
     if column_header_flags[key]:
       tables[key].columns = tables[key].loc[0]
