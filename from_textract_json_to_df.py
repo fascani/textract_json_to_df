@@ -252,7 +252,8 @@ def build_df(textract_json):
               tables[key].loc[row0, col0+jj] = content.strip()
     # Create column headers if headers were identified
     if column_header_flags[key]:
-      tables[key].columns = tables[key].loc[0]
+      # Make sure the columns will have a different nam
+      tables[key].columns = [str(i) + '-' + col for i, col in enumerate(tables[key].loc[0])]
       tables[key] = tables[key].loc[1:]
 
   return tables
